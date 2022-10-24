@@ -12,7 +12,7 @@ struct UserLoginCard: View {
     @Binding var emailText: String
     @Binding var passwordText: String
     
-    @State private var isSigningUp = true
+    @State private var isSigningUp = false
     
     var signupAction: (String, String) -> Void
     var loginAction: (String, String) -> Void
@@ -83,7 +83,7 @@ struct ManagerLoginCard: View {
     @Binding var emailText: String
     @Binding var passwordText: String
     
-    @State private var isSigningUp = true
+    @State private var isSigningUp = false
     
     var signupAction: (String, String) -> Void
     var loginAction: (String, String) -> Void

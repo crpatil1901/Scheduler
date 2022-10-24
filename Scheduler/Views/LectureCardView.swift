@@ -9,8 +9,6 @@ import SwiftUI
 
 struct LectureCardView: View {
     
-    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    
     let lecture: Lecture
     var body: some View {
         VStack(spacing: 8) {
@@ -33,6 +31,7 @@ struct LectureCardView: View {
         .padding()
         .background(lecture.color.cornerRadius(12))
         .padding(.horizontal)
+        .padding(.bottom)
     }
 }
 
@@ -40,7 +39,7 @@ struct LectureCardView_Previews: PreviewProvider {
     static var previews: some View {
         ScrollView {
             VStack(spacing: 16) {
-                ForEach(Lecture.samples, id: \.startTime) { lecture in
+                ForEach(Lecture.samples, id: \.id) { lecture in
                     LectureCardView(lecture: lecture)
                 }
             }

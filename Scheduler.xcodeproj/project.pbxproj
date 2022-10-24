@@ -7,11 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		822F544529002FC80085FFF7 /* AttendanceCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822F544429002FC80085FFF7 /* AttendanceCardView.swift */; };
+		822F54472900301B0085FFF7 /* AttendanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822F54462900301A0085FFF7 /* AttendanceView.swift */; };
+		822F544929003EEB0085FFF7 /* AttendanceRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822F544829003EEB0085FFF7 /* AttendanceRecord.swift */; };
 		82394D6F28F96C3C009CBCEB /* SchedulerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82394D6E28F96C3C009CBCEB /* SchedulerApp.swift */; };
 		82394D7128F96C3C009CBCEB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82394D7028F96C3C009CBCEB /* ContentView.swift */; };
 		82394D7328F96C3D009CBCEB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 82394D7228F96C3D009CBCEB /* Assets.xcassets */; };
 		82394D7628F96C3D009CBCEB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 82394D7528F96C3D009CBCEB /* Preview Assets.xcassets */; };
 		82394D7D28F97CDC009CBCEB /* LoginScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82394D7C28F97CDC009CBCEB /* LoginScreen.swift */; };
+		8259A8312903A2C4005CE2E3 /* RollCallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8259A8302903A2C4005CE2E3 /* RollCallView.swift */; };
 		82B72A7528FD1EFB00B52803 /* Lecture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B72A7428FD1EFB00B52803 /* Lecture.swift */; };
 		82B72A7728FD307600B52803 /* ScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B72A7628FD307600B52803 /* ScheduleView.swift */; };
 		82B72A7928FD46B700B52803 /* LectureCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B72A7828FD46B700B52803 /* LectureCardView.swift */; };
@@ -33,12 +37,16 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		822F544429002FC80085FFF7 /* AttendanceCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttendanceCardView.swift; sourceTree = "<group>"; };
+		822F54462900301A0085FFF7 /* AttendanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttendanceView.swift; sourceTree = "<group>"; };
+		822F544829003EEB0085FFF7 /* AttendanceRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttendanceRecord.swift; sourceTree = "<group>"; };
 		82394D6B28F96C3C009CBCEB /* Scheduler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Scheduler.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		82394D6E28F96C3C009CBCEB /* SchedulerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerApp.swift; sourceTree = "<group>"; };
 		82394D7028F96C3C009CBCEB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		82394D7228F96C3D009CBCEB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		82394D7528F96C3D009CBCEB /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		82394D7C28F97CDC009CBCEB /* LoginScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginScreen.swift; sourceTree = "<group>"; };
+		8259A8302903A2C4005CE2E3 /* RollCallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RollCallView.swift; sourceTree = "<group>"; };
 		82B72A7428FD1EFB00B52803 /* Lecture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lecture.swift; sourceTree = "<group>"; };
 		82B72A7628FD307600B52803 /* ScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleView.swift; sourceTree = "<group>"; };
 		82B72A7828FD46B700B52803 /* LectureCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LectureCardView.swift; sourceTree = "<group>"; };
@@ -113,12 +121,15 @@
 			children = (
 				82394D7C28F97CDC009CBCEB /* LoginScreen.swift */,
 				82C8B39528FBEC4800D9C198 /* LoginCards.swift */,
+				82B72A7A28FD550500B52803 /* HomeView.swift */,
 				82394D7028F96C3C009CBCEB /* ContentView.swift */,
 				82C8B3AA28FC192F00D9C198 /* ProfileView.swift */,
+				8259A8302903A2C4005CE2E3 /* RollCallView.swift */,
 				82B72A7628FD307600B52803 /* ScheduleView.swift */,
 				82B72A7828FD46B700B52803 /* LectureCardView.swift */,
-				82B72A7A28FD550500B52803 /* HomeView.swift */,
 				82B72A7C28FD91E900B52803 /* LectureEditView.swift */,
+				822F544429002FC80085FFF7 /* AttendanceCardView.swift */,
+				822F54462900301A0085FFF7 /* AttendanceView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -138,6 +149,7 @@
 				82C8B39728FC0AC400D9C198 /* FirebaseManager.swift */,
 				82C8B3AC28FC69D800D9C198 /* Student.swift */,
 				82B72A7428FD1EFB00B52803 /* Lecture.swift */,
+				822F544829003EEB0085FFF7 /* AttendanceRecord.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -225,10 +237,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				82C8B3AF28FC71BD00D9C198 /* StudentViewModel.swift in Sources */,
+				822F54472900301B0085FFF7 /* AttendanceView.swift in Sources */,
 				82C8B39828FC0AC400D9C198 /* FirebaseManager.swift in Sources */,
+				8259A8312903A2C4005CE2E3 /* RollCallView.swift in Sources */,
 				82B72A7B28FD550500B52803 /* HomeView.swift in Sources */,
 				82394D7128F96C3C009CBCEB /* ContentView.swift in Sources */,
 				82394D6F28F96C3C009CBCEB /* SchedulerApp.swift in Sources */,
+				822F544529002FC80085FFF7 /* AttendanceCardView.swift in Sources */,
 				82B72A7D28FD91E900B52803 /* LectureEditView.swift in Sources */,
 				82B72A7528FD1EFB00B52803 /* Lecture.swift in Sources */,
 				82C8B3AB28FC192F00D9C198 /* ProfileView.swift in Sources */,
@@ -238,6 +253,7 @@
 				82B72A7928FD46B700B52803 /* LectureCardView.swift in Sources */,
 				82B72A7728FD307600B52803 /* ScheduleView.swift in Sources */,
 				82C8B3AD28FC69D800D9C198 /* Student.swift in Sources */,
+				822F544929003EEB0085FFF7 /* AttendanceRecord.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

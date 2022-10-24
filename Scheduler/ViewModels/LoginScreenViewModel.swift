@@ -34,7 +34,7 @@ class LoginScreenViewModel: ObservableObject {
                 return
             }
             if let result = result {
-                self.email = email
+                    self.email = email
                 self.id = result.user.uid
                 self.getStudentData(result.user.uid, email: email)
             } else {
@@ -67,7 +67,6 @@ class LoginScreenViewModel: ObservableObject {
 
             } else if let snapshot = snapshot {
                 self.fetchedData = snapshot.data()
-                
                 withAnimation {
                     self.isLoggedIn = true
                 }

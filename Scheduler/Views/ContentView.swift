@@ -35,7 +35,6 @@ struct ContentView: View {
             .transition(.asymmetric(insertion: .push(from: .trailing), removal: .push(from: .leading)))
         } else {
             LoginScreen(vm: loginVM)
-            
         }
     }
 }

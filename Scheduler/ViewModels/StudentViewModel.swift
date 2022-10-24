@@ -11,8 +11,13 @@ import FirebaseFirestore
 class StudentViewModel: ObservableObject {
     
     @Published var student: Student
-    @Published var lectures = /* [Lecture]() */ Lecture.samples
+    @Published var lectures = [Lecture]()
     @Published var editMode = false
+    @Published var studentImageData: Data? = nil
+    
+    @Published var pastLectures = [Lecture]()
+    @Published var ongoingLectures = [Lecture]()
+    @Published var futureLectures = [Lecture]()
     
     var signOutAction: () -> Void
     
@@ -31,16 +36,47 @@ class StudentViewModel: ObservableObject {
                 print("Error saving data: \(error.localizedDescription)")
             }
         }
+        
+        if let imageData = studentImageData {
+            guard let uid = FirebaseManager.shared.auth.currentUser?.uid else {
+                print("No User Found")
+                return
+            }
+            FirebaseManager.shared.storage.reference(withPath: uid).putData(imageData) { result in
+                switch result {
+                    case.failure(let error):
+                        print("Error uploading data: \(error.localizedDescription)")
+                    case.success(let metadata):
+                        print("Image saved: \(metadata)")
+                }
+            }
+        }
     }
     
     func addLecture(_ newLecture: inout Lecture) {
-        for i in 0 ..< self.lectures.count {
-            if self.lectures[i].id == newLecture.id {
-                self.lectures[i] = newLecture
-                return
+        let data: [String: Any] = [
+            "subject": newLecture.subject,
+            "professor": newLecture.professor,
+            "startTime": Timestamp(date: newLecture.startTime),
+            "duration": newLecture.duration,
+        ]
+        if newLecture.id.isEmpty {
+            self.lectures.append(newLecture)
+            FirebaseManager.shared.db.collection("classes").document(student.studentClass).collection("lectures").addDocument(data: data) { error in
+                if let error = error {
+                    print("Error saving data: \(error.localizedDescription)")
+                }
             }
+        } else {
+            for i in 0 ..< self.lectures.count {
+                if self.lectures[i].id == newLecture.id {
+                    self.lectures[i] = newLecture
+                }
+            }
+            FirebaseManager.shared.db.collection("classes").document(student.studentClass).collection("lectures").document(newLecture.id).setData(data)
         }
-        self.lectures.append(newLecture)
+        
+        self.fetchLectures(className: student.studentClass)
         newLecture = Lecture()
     }
     
@@ -59,7 +95,22 @@ class StudentViewModel: ObservableObject {
                             startTime: (data["startTime"] as? Timestamp)?.dateValue() ?? Date.distantPast,
                             duration: data["duration"] as? Int ?? 0
                         )
+                    }.sorted { $0.startTime < $1.startTime }
+                    
+                    self.pastLectures = [Lecture]()
+                    self.futureLectures = [Lecture]()
+                    self.ongoingLectures = [Lecture]()
+                    
+                    for lecture in self.lectures {
+                        if lecture.startTime + TimeInterval(lecture.duration*60) < Date() {
+                            self.pastLectures.append(lecture)
+                        } else if lecture.startTime > Date() {
+                            self.futureLectures.append(lecture)
+                        } else {
+                            self.ongoingLectures.append(lecture)
+                        }
                     }
+                    
                 } else {
                     print("Snapshot invalid")
                 }
@@ -72,6 +123,16 @@ class StudentViewModel: ObservableObject {
         self.signOutAction = signOutAction
         if !student.studentClass.isEmpty {
             self.fetchLectures(className: student.studentClass)
+        }
+        print("Started download")
+        FirebaseManager.shared.storage.reference(forURL: "gs://scheduler-3ab9f.appspot.com/\(student.id)").getData(maxSize: 10485760) { result in
+            print("Downloaded", result)
+            switch result {
+                case .success(let data):
+                    self.studentImageData = data
+                case .failure(let error):
+                    print("Error Downloading profile picture: \(error.localizedDescription)")
+            }
         }
     }
 }

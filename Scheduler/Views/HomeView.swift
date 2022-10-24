@@ -29,6 +29,11 @@ struct HomeView: View {
                     Label("Schedule", systemImage: "calendar")
                 }
                 .tag(1)
+            AttendanceView(vm: vm)
+                .tabItem {
+                    Label("Attendance", systemImage: "chart.pie.fill")
+                }
+                .tag(3)
             ProfileView(vm: vm)
                 .tabItem {
                     Label("Profile", systemImage: "person")

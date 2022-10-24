@@ -6,10 +6,15 @@
 //
 
 import SwiftUI
+import PhotosUI
+import CoreImage.CIFilterBuiltins
 
 struct ProfileView: View {
     
     @ObservedObject var vm: StudentViewModel
+    @State private var pickedPhoto: PhotosPickerItem? = nil
+    @State var isShowingActionSheet = false
+    @State var isShowingBarcode = false
     
     var body: some View {
         NavigationView {
@@ -18,9 +23,55 @@ struct ProfileView: View {
                     HStack {
                         Spacer()
                         VStack {
-                            Image(systemName: "person.circle")
-                                .font(.system(size: 96))
-                                .padding(.bottom, 4)
+                            if vm.editMode {
+                                PhotosPicker(selection: $pickedPhoto) {
+                                    if let data = vm.studentImageData, let uiImage = UIImage(data: data) {
+                                        Image(uiImage: uiImage)
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: 100, height: 100)
+                                            .cornerRadius(50)
+                                            .overlay {
+                                                RoundedRectangle(cornerRadius: 50)
+                                                    .stroke(lineWidth: 4)
+                                                    .frame(width: 100, height: 100)
+                                            }
+                                            .padding(.bottom, 4)
+                                            .transition(.opacity)
+                                            
+                                    } else {
+                                        Image(systemName: "person.circle")
+                                            .resizable()
+                                            .frame(width: 100, height: 100)
+                                            .padding(.bottom, 4)
+                                            .transition(.opacity)
+                                    }
+                                }
+                                .onChange(of: pickedPhoto) { newItem in
+                                    Task {
+                                        if let data = try? await newItem?.loadTransferable(type: Data.self) {
+                                            vm.studentImageData = data
+                                        }
+                                    }
+                                }
+                            } else {
+                                if let data = vm.studentImageData, let uiImage = UIImage(data: data) {
+                                    Image(uiImage: uiImage)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 100, height: 100)
+                                        .cornerRadius(50)
+                                        .padding(.bottom, 4)
+                                        .transition(.opacity)
+                                } else {
+                                    Image(systemName: "person.circle")
+                                        .resizable()
+                                        .frame(width: 100, height: 100)
+                                        .padding(.bottom, 4)
+                                        .transition(.opacity)
+                                }
+                                
+                            }
                             if vm.editMode {
                                 TextField("Name", text: $vm.student.name)
                                     .font(.title2)
@@ -41,31 +92,6 @@ struct ProfileView: View {
                             
                         }
                         Spacer()
-                    }
-                    
-                    .overlay(alignment: .topTrailing) {
-                        HStack {
-                            if vm.editMode {
-                                Button("Done") {
-                                    withAnimation {
-                                        self.vm.editMode = false
-                                    }
-                                    vm.saveStudentData()
-                                }
-                                .bold()
-                            } else {
-                                Button {
-                                    withAnimation {
-                                        self.vm.editMode = true
-                                    }
-                                } label: {
-                                    Image(systemName: "square.and.pencil")
-                                        .font(.title2)
-                                }
-                            }
-                        }
-                        .frame(height: 40)
-                        
                     }
                     .padding()
                     VStack {
@@ -124,14 +150,14 @@ struct ProfileView: View {
                         VStack {
                             Text("Attendance")
                                 .bold()
-                            Text("\(vm.student.attendence.formatted())%")
+                            Text("69%")
                                 .frame(height: 40)
                         }
                         .frame(width: 100)
                     }
                     .padding()
                     Button {
-                        vm.signOutAction()
+                        isShowingActionSheet = true
                     } label: {
                         Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
                             .bold()
@@ -142,6 +168,92 @@ struct ProfileView: View {
                 }
             }
             .navigationTitle("Dashboard")
+            .confirmationDialog("Sign Out?", isPresented: $isShowingActionSheet) {
+                Button("Sign Out", role: .destructive) {
+                    vm.signOutAction()
+                }
+            } message: {
+                Text("Are you sure you want to Sign Out?")
+            }
+            .sheet(isPresented: $isShowingBarcode){
+                BarcodeView(id: vm.student.userID, isPresented: $isShowingBarcode)
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        self.isShowingBarcode = true
+                    } label: {
+                        Image(systemName: "barcode")
+                    }
+
+                }
+                ToolbarItem(placement: .primaryAction) {
+                    if vm.editMode {
+                        Button("Done") {
+                            withAnimation {
+                                self.vm.editMode = false
+                            }
+                            vm.saveStudentData()
+                        }
+                        .bold()
+                    } else {
+                        Button {
+                            withAnimation {
+                                self.vm.editMode = true
+                            }
+                        } label: {
+                            Image(systemName: "square.and.pencil")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+struct BarcodeView: View {
+    
+    let id: String
+    @Binding var isPresented: Bool
+    
+    let context = CIContext()
+//    let filter = CIFilter.qrCodeGenerator()
+    let filter = CIFilter.barcodeGenerator()
+    
+    func generateBarcode(_ string: String) -> Image {
+        
+        let errorImage = Image(systemName: "exclamationmark.triangle")
+        
+        guard let message = string.data(using: .ascii) else { return errorImage }
+        
+        filter.setValue(message, forKey: "inputMessage")
+        
+        guard let outputImage = filter.outputImage else { return errorImage }
+        
+        guard let cgImage = context.createCGImage(outputImage, from: outputImage.extent) else { return errorImage }
+        
+        return Image(uiImage: UIImage(cgImage: cgImage))
+        
+    }
+    
+    var body: some View {
+        NavigationView {
+            generateBarcode(id)
+                .interpolation(.none)
+                .resizable()
+                .scaledToFit()
+                .frame(width: .infinity)
+                .padding()
+                .toolbar {
+                    ToolbarItem(placement: .principal) {
+                        Button {
+                            isPresented = false
+                        } label: {
+                            Image(systemName: "chevron.down")
+                                .font(.title)
+                        }
+                    }
+                }
         }
     }
 }
@@ -149,6 +261,5 @@ struct ProfileView: View {
 struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {
         ProfileView(vm: StudentViewModel(Student.sample, signOutAction: {}))
-            .preferredColorScheme(.dark)
     }
 }

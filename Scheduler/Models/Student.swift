@@ -16,16 +16,30 @@ struct Student: Identifiable {
     var phoneNumber: String
     var studentClass: String
     
-    var attendence: Double
+    var attendance: [AttendanceRecord]  = [
+        .init(subject: "CG", conducted: 38, attended: 29),
+        .init(subject: "DM", conducted: 42, attended: 31),
+        .init(subject: "FDS", conducted: 36, attended: 32),
+        .init(subject: "DELD", conducted: 35, attended: 25),
+        .init(subject: "OOP", conducted: 39, attended: 31),
+        .init(subject: "DSL", conducted: 15, attended: 13),
+        .init(subject: "OOPCGL", conducted: 13, attended: 12),
+        .init(subject: "DEL", conducted: 7, attended: 6),
+        .init(subject: "BCSL", conducted: 5, attended: 2),
+        .init(subject: "HSS", conducted: 7, attended: 5),
+    ]
     
-    init(id: String, emailID: String, userID: String, name: String, phoneNumber: String, studentClass: String, attendence: Double) {
+    var aggregateAttendance: Double {
+        attendance.reduce(0) {$0 + Double($1.attended)} / attendance.reduce(0) {$0 + Double($1.conducted)}
+    }
+    
+    init(id: String, emailID: String, userID: String, name: String, phoneNumber: String, studentClass: String) {
         self.id = id
         self.emailID = emailID
         self.userID = userID
         self.name = name
         self.phoneNumber = phoneNumber
         self.studentClass = studentClass
-        self.attendence = attendence
     }
     
     init(id: String, email: String) {
@@ -35,7 +49,6 @@ struct Student: Identifiable {
         self.name = ""
         self.phoneNumber = ""
         self.studentClass = "SE1"
-        self.attendence = 69.42
     }
 
     init(_ data: [String: Any]) {
@@ -45,8 +58,7 @@ struct Student: Identifiable {
         self.name = data["name"] as? String ?? "unknown"
         self.phoneNumber = data["phoneNumber"] as? String ?? "unknown"
         self.studentClass = data["class"] as? String ?? "unknown"
-        self.attendence = 69.42
     }
     
-    static let sample = Student(id: "REXfctuytVItufd", emailID: "crpatil1901@gmail.com", userID: "crpatil1901", name: "Chinmay Patil", phoneNumber: "9860767300", studentClass: "SE3", attendence: 69.42)
+    static let sample = Student(id: "REXfctuytVItufd", emailID: "crpatil1901@gmail.com", userID: "crpatil1901", name: "Chinmay Patil", phoneNumber: "9860767300", studentClass: "SE3")
 }
