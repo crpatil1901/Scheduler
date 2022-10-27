@@ -22,9 +22,13 @@ struct RollCallView: View {
     }
     
     @State var roll: Int? = 1
+    @State var records = [(Int, Bool)]()
+    @State var isComplete = false
     
-    @State var present = [Int]()
-    @State var absent  = [Int]()
+    let lastRoll = 21
+    
+//    @State var roll: Int? = 9
+//    @State var records = [(1,true), (2,true), (3,true), (4,true), (5,false), (6,true), (7,true), (8,false), ]
     
     var scale: CGSize {
         let moved = offset.width.magnitude
@@ -65,16 +69,54 @@ struct RollCallView: View {
         }
     }
     
+    func getProportion(pos: CGFloat, width: CGFloat) -> Double { return ( pos - width/2 ) / width }
+    
     var body: some View {
         VStack {
-            HStack {
-                Text("Present: ")
-                Text("\(present.reduce("") { $0 + String($1) + "," })")
+            ScrollView(.horizontal, showsIndicators: false) {
+                ScrollViewReader { proxy in
+                    HStack(spacing: 0) {
+                        Rectangle()
+                            .foregroundColor(.clear)
+                            .frame(width: 8)
+                            .id(0)
+                        ForEach(self.records, id: \.0) { rec in
+                            GeometryReader { geometry in
+                                let proportion = self.getProportion(
+                                    pos: geometry.frame(in: .global).midX,
+                                    width: UIScreen.main.bounds.width
+                                )
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .foregroundColor(rec.1 ? .green : .red)
+                                    Text("\(rec.0)")
+                                        .font(.title)
+                                        .bold()
+                                }
+                                .rotation3DEffect(
+                                    Angle(degrees: 30 * proportion),
+                                    axis: (0,1,0)
+                                )
+                                .scaleEffect(1 - pow(proportion, 2)*1.1)
+                                .offset(x: proportion.magnitude < 1 ? (-160) * pow(proportion, 3) : 0)
+                            }
+                            .aspectRatio(5/7, contentMode: .fit)
+                            .id(rec.1)
+                            .padding(2.5)
+                        }
+                        Rectangle()
+                            .foregroundColor(.clear)
+                            .frame(width: 8)
+                            .id(-1)
+                    }
+                    .onChange(of: records.count) { newValue in
+                        withAnimation {
+                            proxy.scrollTo(-1)
+                        }
+                    }
+                }
             }
-            HStack {
-                Text("Absent: ")
-                Text("\(absent.reduce("") { $0 + String($1) + "," })")
-            }
+            .frame(height: 80)
             if let roll = roll {
                 RoundedRectangle(cornerRadius: 24)
                     .foregroundStyle(cardGradient)
@@ -84,6 +126,17 @@ struct RollCallView: View {
                         Text("\(roll)")
                             .font(.system(size: 144, weight: .bold))
                     }
+                    .shadow(
+                        color: {
+                            switch result {
+                                case -1: return .red.opacity(0.8)
+                                case  0: return .blue.opacity(0.8)
+                                case  1: return .green.opacity(0.8)
+                                default: return .primary.opacity(0.8)
+                            }
+                        }(),
+                        radius: 48
+                    )
                     .offset(offset)
                     .scaleEffect(scale)
                     .rotationEffect(rotation)
@@ -104,9 +157,10 @@ struct RollCallView: View {
                                     }
                                 } else {
                                     if proportion > 0 {
-                                        present.append(roll)
+                                        withAnimation { records.append((roll,  true)) }
+
                                     } else {
-                                        absent.append(roll)
+                                        withAnimation { records.append((roll, false)) }
                                     }
                                     withAnimation(.easeIn(duration: 0.2)) {
                                         self.offset = CGSize(
@@ -120,18 +174,56 @@ struct RollCallView: View {
                                         self.offset = .zero
                                     }
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                        withAnimation {
-                                            self.roll = newRoll
+                                        if newRoll <= lastRoll {
+                                            withAnimation {
+                                                self.roll = newRoll
+                                            }
+                                        } else {
+                                            isComplete = true
                                         }
                                     }
                                 }
                             }
                     )
                     .transition(.scale)
+            } else if isComplete {
+                NavigationLink(destination: RollCallEditView(records: records)) {
+                    RoundedRectangle(cornerRadius: 24)
+                        .foregroundStyle(.gray)
+                        .padding(48)
+                        .aspectRatio(5/7, contentMode: .fit)
+                        .overlay {
+                            Label("Edit", systemImage: "pencil")
+                                .font(.system(size: 48, weight: .bold))
+                                .foregroundColor(.primary)
+                        }
+                        .shadow(
+                            color: .gray,
+                            radius: 48
+                        )
+                }
             }
             Spacer()
         }
-        .padding(.vertical, 64)
+        .overlay(alignment: .bottom) {
+            HStack {
+                HStack {
+                    Image(systemName: "arrow.left")
+                    Text("Absent")
+                }
+                .foregroundColor(.red)
+                Spacer()
+                HStack {
+                    Text("Present")
+                    Image(systemName: "arrow.right")
+                }
+                .foregroundColor(.green)
+            }
+            .font(.title3)
+            .bold()
+            .padding(.horizontal, 32)
+        }
+        .padding(.vertical)
     }
 }
 

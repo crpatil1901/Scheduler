@@ -86,6 +86,7 @@ struct LoginScreen: View {
                 vm.isShowingAlert = false
             }
         }
+        .blur(radius: vm.isLoading || vm.isShowingAlert ? 8 : 0)
         .overlay {
             if vm.isLoading {
                 ZStack {
@@ -98,6 +99,8 @@ struct LoginScreen: View {
 
             }
         }
+        .animation(.easeInOut, value: vm.isLoading)
+        .animation(.easeInOut, value: vm.isShowingAlert)
     }
 }
 

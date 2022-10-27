@@ -11,10 +11,10 @@ struct Student: Identifiable {
     
     let id: String
     var emailID: String
-    var userID: String
     var name: String
     var phoneNumber: String
     var studentClass: String
+    var rollNumber: Int
     
     var attendance: [AttendanceRecord]  = [
         .init(subject: "CG", conducted: 38, attended: 29),
@@ -33,32 +33,33 @@ struct Student: Identifiable {
         attendance.reduce(0) {$0 + Double($1.attended)} / attendance.reduce(0) {$0 + Double($1.conducted)}
     }
     
-    init(id: String, emailID: String, userID: String, name: String, phoneNumber: String, studentClass: String) {
+    init(id: String, emailID: String, userID: String, name: String, phoneNumber: String, studentClass: String, rollNo: Int) {
         self.id = id
         self.emailID = emailID
-        self.userID = userID
         self.name = name
         self.phoneNumber = phoneNumber
         self.studentClass = studentClass
+        self.rollNumber = rollNo
     }
     
-    init(id: String, email: String) {
-        self.id = id
+    init(email: String) {
         self.emailID = email
-        self.userID = email.components(separatedBy: "@").first ?? "error"
+        self.id = email.components(separatedBy: "@").first ?? "BadEmail"
         self.name = ""
         self.phoneNumber = ""
         self.studentClass = "SE1"
+        self.rollNumber = 0
     }
 
     init(_ data: [String: Any]) {
-        self.id = data["id"] as? String ?? "unknown"
-        self.emailID = data["emailID"] as? String ?? "unknown"
-        self.userID = data["userID"] as? String ?? "unknown"
+        print(data)
+        self.id = data["registrationNumber"] as? String ?? "unknown"
+        self.emailID = data["email"] as? String ?? "unknown"
         self.name = data["name"] as? String ?? "unknown"
         self.phoneNumber = data["phoneNumber"] as? String ?? "unknown"
-        self.studentClass = data["class"] as? String ?? "unknown"
+        self.studentClass = data["className"] as? String ?? "unknown"
+        self.rollNumber = data["rollNo"] as? Int ?? -1
     }
     
-    static let sample = Student(id: "REXfctuytVItufd", emailID: "crpatil1901@gmail.com", userID: "crpatil1901", name: "Chinmay Patil", phoneNumber: "9860767300", studentClass: "SE3")
+    static let sample = Student(id: "TEST_STUDENT_USER", emailID: "sample.student@pict.edu", userID: "C2K00000000", name: "Sample Student", phoneNumber: "9999999999", studentClass: "SE3", rollNo: 10436)
 }

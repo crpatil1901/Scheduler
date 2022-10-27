@@ -15,27 +15,30 @@ struct ContentView: View {
         if let data = loginVM.fetchedData {
             return Student(data)
         } else {
-            return Student(id: loginVM.id ?? "errorIdentifier", email: loginVM.email ?? "error@error.com")
+            return Student(email: loginVM.email ?? "error@error.com")
         }
         
     }
     
+//    var body: some View {
+//        if loginVM.isLoggedIn {
+//            HomeView(vm: StudentViewModel(
+//                getStudentObject(),
+//                signOutAction: {
+//                    withAnimation {
+//                        loginVM.isLoggedIn = false
+//                        loginVM.isLoading = false
+//                    }
+//                    try? FirebaseManager.shared.auth.signOut()
+//                }
+//            ))
+//            .transition(.asymmetric(insertion: .push(from: .trailing), removal: .push(from: .leading)))
+//        } else {
+//            LoginScreen(vm: loginVM)
+//        }
+//    }
     var body: some View {
-        if loginVM.isLoggedIn {
-            HomeView(vm: StudentViewModel(
-                getStudentObject(),
-                signOutAction: {
-                    withAnimation {
-                        loginVM.isLoggedIn = false
-                        loginVM.isLoading = false
-                    }
-                    try? FirebaseManager.shared.auth.signOut()
-                }
-            ))
-            .transition(.asymmetric(insertion: .push(from: .trailing), removal: .push(from: .leading)))
-        } else {
-            LoginScreen(vm: loginVM)
-        }
+        RollCardsView(rollNumbers: [1,2,3,4,5,6,7])
     }
 }
 

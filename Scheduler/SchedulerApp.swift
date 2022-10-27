@@ -20,4 +20,5 @@ struct SchedulerApp: App {
             ContentView()
         }
     }
+    
 }

@@ -7,14 +7,16 @@
 
 import SwiftUI
 import PhotosUI
-import CoreImage.CIFilterBuiltins
+import CoreImage
 
 struct ProfileView: View {
     
     @ObservedObject var vm: StudentViewModel
     @State private var pickedPhoto: PhotosPickerItem? = nil
     @State var isShowingActionSheet = false
-    @State var isShowingBarcode = false
+    @State var isShowingBarcode = false // TODO: Change to false
+    
+    @State var originalBrigtness: CGFloat = 0.5
     
     var body: some View {
         NavigationView {
@@ -142,15 +144,15 @@ struct ProfileView: View {
                         VStack {
                             Text("User ID")
                                 .bold()
-                            Text(vm.student.userID)
+                            Text(vm.student.id)
                                 .frame(height: 40)
                         }
                         .frame(width: 110)
                         Spacer()
                         VStack {
-                            Text("Attendance")
+                            Text("Roll Number")
                                 .bold()
-                            Text("69%")
+                            Text(String(vm.student.rollNumber))
                                 .frame(height: 40)
                         }
                         .frame(width: 100)
@@ -176,7 +178,14 @@ struct ProfileView: View {
                 Text("Are you sure you want to Sign Out?")
             }
             .sheet(isPresented: $isShowingBarcode){
-                BarcodeView(id: vm.student.userID, isPresented: $isShowingBarcode)
+                BarcodeView(id: vm.student.id, isPresented: $isShowingBarcode)
+                    .onAppear {
+                        originalBrigtness = UIScreen.main.brightness
+                        UIScreen.main.brightness = 1.0
+                    }
+                    .onDisappear {
+                        UIScreen.main.brightness = originalBrigtness
+                    }
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -213,47 +222,60 @@ struct ProfileView: View {
 
 struct BarcodeView: View {
     
+    func createBarcodeFromString(barcode:String)->UIImage?{
+
+        let data = barcode.data(using: .ascii)
+        guard let filter = CIFilter(name: "CICode128BarcodeGenerator") else {
+            return nil
+        }
+        filter.setValue(data, forKey: "inputMessage")
+        filter.setValue(7.0, forKey:"inputQuietSpace")
+        guard var ciImage = filter.outputImage else {
+            return nil
+        }
+
+        let imageSize = ciImage.extent.integral
+        let outputSize = CGSize(width:320, height: 60)
+        ciImage = ciImage.transformed(by:CGAffineTransform(scaleX: outputSize.width/imageSize.width, y: outputSize.height/imageSize.height))
+
+        let image = convertCIImageToUIImage(ciimage: ciImage)
+        
+        return image
+    }
+
+    func convertCIImageToUIImage(ciimage:CIImage)->UIImage{
+        let context:CIContext = CIContext.init(options: nil)
+        let cgImage:CGImage = context.createCGImage(ciimage, from: ciimage.extent)!
+        let image:UIImage = UIImage.init(cgImage: cgImage)
+        return image
+    }
+    
     let id: String
     @Binding var isPresented: Bool
     
-    let context = CIContext()
-//    let filter = CIFilter.qrCodeGenerator()
-    let filter = CIFilter.barcodeGenerator()
-    
-    func generateBarcode(_ string: String) -> Image {
-        
-        let errorImage = Image(systemName: "exclamationmark.triangle")
-        
-        guard let message = string.data(using: .ascii) else { return errorImage }
-        
-        filter.setValue(message, forKey: "inputMessage")
-        
-        guard let outputImage = filter.outputImage else { return errorImage }
-        
-        guard let cgImage = context.createCGImage(outputImage, from: outputImage.extent) else { return errorImage }
-        
-        return Image(uiImage: UIImage(cgImage: cgImage))
-        
-    }
-    
     var body: some View {
         NavigationView {
-            generateBarcode(id)
-                .interpolation(.none)
-                .resizable()
-                .scaledToFit()
-                .frame(width: .infinity)
-                .padding()
-                .toolbar {
-                    ToolbarItem(placement: .principal) {
-                        Button {
-                            isPresented = false
-                        } label: {
-                            Image(systemName: "chevron.down")
-                                .font(.title)
-                        }
+            GeometryReader { geometry in
+                Image(uiImage: createBarcodeFromString(barcode: id)!)
+                    .interpolation(.none)
+                    .resizable()
+                    .rotationEffect(Angle(degrees: 90))
+                    .scaleEffect(1.5)
+                    .cornerRadius(32)
+                    .clipped()
+                    .padding(.horizontal, 16)
+                    
+            }
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Button {
+                        isPresented = false
+                    } label: {
+                        Image(systemName: "chevron.down")
+                            .font(.title)
                     }
                 }
+            }
         }
     }
 }

@@ -16,7 +16,6 @@ class LoginScreenViewModel: ObservableObject {
     
     @Published var fetchedData: [String: Any]? = nil
     
-    var id: String? = nil
     var email: String? = nil
     
     @Published var alertText: String? {
@@ -33,10 +32,9 @@ class LoginScreenViewModel: ObservableObject {
                 self.alertText = "Error logging in: \(error.localizedDescription)"
                 return
             }
-            if let result = result {
-                    self.email = email
-                self.id = result.user.uid
-                self.getStudentData(result.user.uid, email: email)
+            if result != nil {
+                self.email = email
+                self.getStudentData(email: email)
             } else {
                 self.alertText = "Trouble Signing Up"
             }
@@ -50,21 +48,20 @@ class LoginScreenViewModel: ObservableObject {
                 self.alertText = "Error signing up: \(error.localizedDescription)"
                 return
             }
-            if let result = result {
+            if result != nil {
                 self.email = email
-                self.id = result.user.uid
-                self.getStudentData(result.user.uid, email: email)
+                self.getStudentData(email: email)
             } else {
                 self.alertText = "Trouble logging in"
             }
         }
     }
     
-    func getStudentData(_ id: String, email: String) {
+    func getStudentData(email: String) {
+        let id = FirebaseManager.shared.auth.currentUser?.uid ?? "error: noUser"
         FirebaseManager.shared.db.collection("users").document(id).getDocument { snapshot, error in
             if let error = error {
                 self.alertText = "Error retrieving data: \(error.localizedDescription)"
-
             } else if let snapshot = snapshot {
                 self.fetchedData = snapshot.data()
                 withAnimation {

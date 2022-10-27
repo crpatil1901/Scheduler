@@ -11,6 +11,7 @@ struct ScheduleView: View {
     
     @State var isSheetPresented = false
     @State var sheetLecture = Lecture()
+    @State var isAnimating = false
     @ObservedObject var vm: StudentViewModel
     
     var body: some View {
@@ -23,6 +24,19 @@ struct ScheduleView: View {
                                 .font(.headline)
                                 .foregroundColor(.secondary)
                             Spacer()
+                            NavigationLink {
+                                RollCallView()
+                                    .task {
+                                        Task {
+                                            await print(vm.getStudentsFrom(vm.student.studentClass))
+                                        }
+                                    }
+                            } label: {
+                                Label("Roll Call", systemImage: "person.fill.checkmark")
+                                    .foregroundColor(.blue)
+                                    .multilineTextAlignment(.trailing)
+                                    .font(.headline)
+                            }
                         }
                         .padding(.horizontal)
                     }
@@ -31,14 +45,10 @@ struct ScheduleView: View {
                             sheetLecture = lecture
                             isSheetPresented = true
                         } label: {
-                            LectureCardView(lecture: lecture)
-                                .overlay {
-                                    RoundedRectangle(cornerRadius: 16)
-                                        .stroke(lineWidth: 4)
-                                        .foregroundColor(.red)
-                                        .padding(.horizontal)
-                                        .padding(.bottom)
-                                }
+                            LectureCardView(lecture: lecture, deleteAction: vm.deleteLecture)
+                                .rotation3DEffect(Angle(degrees: isAnimating ? 3 : -3), axis: (0.0, 1.0, 0.0))
+                                .animation(.easeInOut(duration: 1.0).repeatForever(), value: isAnimating)
+                                .onAppear { isAnimating = true }
                         }
                     }
                     if !vm.futureLectures.isEmpty {
@@ -55,7 +65,7 @@ struct ScheduleView: View {
                             sheetLecture = lecture
                             isSheetPresented = true
                         } label: {
-                            LectureCardView(lecture: lecture)
+                            LectureCardView(lecture: lecture, deleteAction: vm.deleteLecture)
                         }
                     }
                     if !vm.pastLectures.isEmpty {
@@ -72,7 +82,7 @@ struct ScheduleView: View {
                             sheetLecture = lecture
                             isSheetPresented = true
                         } label: {
-                            LectureCardView(lecture: lecture)
+                            LectureCardView(lecture: lecture, deleteAction: vm.deleteLecture)
                         }
                         .saturation(0)
                     }
