@@ -135,7 +135,7 @@ struct RollCallView: View {
                                 default: return .primary.opacity(0.8)
                             }
                         }(),
-                        radius: 48
+                        radius: 24
                     )
                     .offset(offset)
                     .scaleEffect(scale)
